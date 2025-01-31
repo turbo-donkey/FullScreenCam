@@ -56,6 +56,7 @@
         let videoDevices = [];
         let currentDeviceIndex = 0;
         let maxResolution = { width: 1280, height: 720 };
+        let isFullscreen = false;
 
         async function getCameras() {
             try {
@@ -74,9 +75,10 @@
                 if (currentStream) {
                     currentStream.getTracks().forEach(track => track.stop());
                 }
-                currentStream = await navigator.mediaDevices.getUserMedia({
+                let constraints = {
                     video: { width: resolution.width, height: resolution.height, deviceId: { exact: deviceId } }
-                });
+                };
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
                 videoElement.srcObject = currentStream;
                 videoElement.style.width = resolution.width + "px";
                 videoElement.style.height = resolution.height + "px";
@@ -85,26 +87,32 @@
             }
         }
 
-        switchButton.addEventListener('click', () => {
+        switchButton.addEventListener('click', async () => {
             if (videoDevices.length > 1) {
                 currentDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
-                startWebcam(videoDevices[currentDeviceIndex].deviceId);
+                let newResolution = isFullscreen ? getMaxResolution() : maxResolution;
+                startWebcam(videoDevices[currentDeviceIndex].deviceId, newResolution);
             }
         });
 
         fullscreenButton.addEventListener('click', async () => {
             if (document.fullscreenElement) {
                 document.exitFullscreen();
+                isFullscreen = false;
                 startWebcam(videoDevices[currentDeviceIndex].deviceId, maxResolution);
             } else {
                 document.documentElement.requestFullscreen();
-                const capabilities = currentStream.getVideoTracks()[0].getCapabilities();
-                const bestResolution = { width: capabilities.width.max, height: capabilities.height.max };
+                isFullscreen = true;
+                let bestResolution = getMaxResolution();
                 startWebcam(videoDevices[currentDeviceIndex].deviceId, bestResolution);
             }
         });
 
-        // Get available cameras and start first one
+        function getMaxResolution() {
+            const capabilities = currentStream.getVideoTracks()[0].getCapabilities();
+            return { width: capabilities.width.max, height: capabilities.height.max };
+        }
+
         getCameras();
     </script>
 </body>
