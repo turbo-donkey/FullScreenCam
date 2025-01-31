@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Viewer</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        video {
+            width: 1920px;
+            height: 1080px;
+            background-color: black;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <video id="webcam" autoplay playsinline></video>
+    <button id="switch-camera">Switch Camera</button>
+
+    <script>
+        let currentStream = null;
+        let videoElement = document.getElementById('webcam');
+        let switchButton = document.getElementById('switch-camera');
+        let videoConstraints = { video: { width: 1920, height: 1080, facingMode: "user" } };
+
+        async function startWebcam(constraints) {
+            try {
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                }
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                videoElement.srcObject = currentStream;
+            } catch (error) {
+                console.error("Error accessing webcam:", error);
+            }
+        }
+
+        switchButton.addEventListener('click', () => {
+            videoConstraints.video.facingMode = 
+                videoConstraints.video.facingMode === "user" ? "environment" : "user";
+            startWebcam(videoConstraints);
+        });
+
+        // Start the webcam on page load
+        startWebcam(videoConstraints);
+    </script>
+</body>
+</html>
