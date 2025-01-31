@@ -45,14 +45,29 @@
         let currentStream = null;
         let videoElement = document.getElementById('webcam');
         let switchButton = document.getElementById('switch-camera');
-        let videoConstraints = { video: { width: 1920, height: 1080, facingMode: "user" } };
+        let videoDevices = [];
+        let currentDeviceIndex = 0;
 
-        async function startWebcam(constraints) {
+        async function getCameras() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                videoDevices = devices.filter(device => device.kind === 'videoinput');
+                if (videoDevices.length > 0) {
+                    startWebcam(videoDevices[currentDeviceIndex].deviceId);
+                }
+            } catch (error) {
+                console.error("Error fetching camera devices:", error);
+            }
+        }
+
+        async function startWebcam(deviceId) {
             try {
                 if (currentStream) {
                     currentStream.getTracks().forEach(track => track.stop());
                 }
-                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                currentStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 1920, height: 1080, deviceId: { exact: deviceId } }
+                });
                 videoElement.srcObject = currentStream;
             } catch (error) {
                 console.error("Error accessing webcam:", error);
@@ -60,13 +75,14 @@
         }
 
         switchButton.addEventListener('click', () => {
-            videoConstraints.video.facingMode = 
-                videoConstraints.video.facingMode === "user" ? "environment" : "user";
-            startWebcam(videoConstraints);
+            if (videoDevices.length > 1) {
+                currentDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
+                startWebcam(videoDevices[currentDeviceIndex].deviceId);
+            }
         });
 
-        // Start the webcam on page load
-        startWebcam(videoConstraints);
+        // Get available cameras and start first one
+        getCameras();
     </script>
 </body>
 </html>
