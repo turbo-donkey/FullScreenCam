@@ -22,8 +22,12 @@
             border: 2px solid #ccc;
             border-radius: 8px;
         }
-        button {
+        .button-container {
+            display: flex;
+            gap: 10px;
             margin-top: 20px;
+        }
+        button {
             padding: 10px 20px;
             font-size: 16px;
             border: none;
@@ -39,8 +43,10 @@
 </head>
 <body>
     <video id="webcam" autoplay playsinline></video>
-    <button id="switch-camera">Switch Camera</button>
-    <button id="fullscreen">Full Screen</button>
+    <div class="button-container">
+        <button id="switch-camera">Switch Camera</button>
+        <button id="fullscreen">Full Screen</button>
+    </div>
 
     <script>
         let currentStream = null;
