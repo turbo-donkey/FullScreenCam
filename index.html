@@ -13,13 +13,14 @@
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #121212;
+            color: white;
         }
         video {
             width: 1280px;
             height: 720px;
             background-color: black;
-            border: 2px solid #ccc;
+            border: 2px solid #444;
             border-radius: 8px;
         }
         .button-container {
@@ -39,11 +40,14 @@
         button:hover {
             background-color: #0056b3;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <video id="webcam" autoplay playsinline></video>
-    <div class="button-container">
+    <div class="button-container" id="button-container">
         <button id="switch-camera">Switch Camera</button>
         <button id="fullscreen">Full Screen</button>
     </div>
@@ -53,6 +57,7 @@
         let videoElement = document.getElementById('webcam');
         let switchButton = document.getElementById('switch-camera');
         let fullscreenButton = document.getElementById('fullscreen');
+        let buttonContainer = document.getElementById('button-container');
         let videoDevices = [];
         let currentDeviceIndex = 0;
         let maxResolution = { width: 1280, height: 720 };
@@ -99,10 +104,12 @@
             if (document.fullscreenElement) {
                 document.exitFullscreen();
                 isFullscreen = false;
+                buttonContainer.classList.remove('hidden');
                 startWebcam(videoDevices[currentDeviceIndex].deviceId, maxResolution);
             } else {
                 document.documentElement.requestFullscreen();
                 isFullscreen = true;
+                buttonContainer.classList.add('hidden');
                 let bestResolution = getMaxResolution();
                 startWebcam(videoDevices[currentDeviceIndex].deviceId, bestResolution);
             }
