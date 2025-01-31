@@ -40,11 +40,13 @@
 <body>
     <video id="webcam" autoplay playsinline></video>
     <button id="switch-camera">Switch Camera</button>
+    <button id="fullscreen">Full Screen</button>
 
     <script>
         let currentStream = null;
         let videoElement = document.getElementById('webcam');
         let switchButton = document.getElementById('switch-camera');
+        let fullscreenButton = document.getElementById('fullscreen');
         let videoDevices = [];
         let currentDeviceIndex = 0;
 
@@ -66,9 +68,11 @@
                     currentStream.getTracks().forEach(track => track.stop());
                 }
                 currentStream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: 1920, height: 1080, deviceId: { exact: deviceId } }
+                    video: { width: 3840, height: 2160, deviceId: { exact: deviceId } }
                 });
                 videoElement.srcObject = currentStream;
+                videoElement.style.width = "100vw";
+                videoElement.style.height = "100vh";
             } catch (error) {
                 console.error("Error accessing webcam:", error);
             }
@@ -78,6 +82,18 @@
             if (videoDevices.length > 1) {
                 currentDeviceIndex = (currentDeviceIndex + 1) % videoDevices.length;
                 startWebcam(videoDevices[currentDeviceIndex].deviceId);
+            }
+        });
+
+        fullscreenButton.addEventListener('click', () => {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+                videoElement.style.width = "1920px";
+                videoElement.style.height = "1080px";
+            } else {
+                document.documentElement.requestFullscreen();
+                videoElement.style.width = "100vw";
+                videoElement.style.height = "100vh";
             }
         });
 
