@@ -16,8 +16,8 @@
             background-color: #f0f0f0;
         }
         video {
-            width: 1920px;
-            height: 1080px;
+            width: 1280px;
+            height: 720px;
             background-color: black;
             border: 2px solid #ccc;
             border-radius: 8px;
@@ -94,8 +94,8 @@
         fullscreenButton.addEventListener('click', () => {
             if (document.fullscreenElement) {
                 document.exitFullscreen();
-                videoElement.style.width = "1920px";
-                videoElement.style.height = "1080px";
+                videoElement.style.width = "1280px";
+                videoElement.style.height = "720px";
             } else {
                 document.documentElement.requestFullscreen();
                 videoElement.style.width = "100vw";
